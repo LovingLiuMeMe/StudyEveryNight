@@ -23,10 +23,17 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
             .authorizeRequests() //指明验证的类型 是请求
+            .antMatchers("/define_login.html","/authentication/form").permitAll() // 自定义登录页面
             .anyRequest() // 对所有请求
             .authenticated() // 需要身份验证
             .and()
-            .formLogin(); // 指定表单登录
-            //上述基本就是默认配置了（添加了依赖之后）
+                .formLogin() // 指定表单登录
+                //上述基本就是默认配置了(添加了依赖之后)
+                    .loginPage("/define_login.html")
+                    .loginProcessingUrl("/authentication/form")
+            .and()
+                .csrf().disable();// 关闭跨站请求保护
+
+
     }
 }
