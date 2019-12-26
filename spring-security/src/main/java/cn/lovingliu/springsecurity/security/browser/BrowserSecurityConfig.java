@@ -43,7 +43,7 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
     public PersistentTokenRepository persistentTokenRepository(){
         JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
         tokenRepository.setDataSource(dataSource);
-        tokenRepository.setCreateTableOnStartup(true); // 系统启动时自动创建表（仅仅限制第一次系统启动,启动一次之后注解掉）
+        //tokenRepository.setCreateTableOnStartup(true); // 系统启动时自动创建表（仅仅限制第一次系统启动,启动一次之后注解掉）
         return tokenRepository;
     }
 
@@ -55,7 +55,7 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
         http
             .authorizeRequests() //指明验证的类型 是请求
             //.antMatchers("/define_login.html","/authentication/form").permitAll() // 自定义登录页面
-            .antMatchers("/authentication/require","/authentication/form","/define_login.html","/code/image").permitAll()
+            .antMatchers("/authentication/require","/authentication/form","/define_login.html","/code/image","/code/sms").permitAll()
             .anyRequest() // 对所有请求
             .authenticated() // 需要身份验证
             .and()

@@ -1,9 +1,15 @@
 package cn.lovingliu.springsecurity.security.browser.controller;
 
 import cn.lovingliu.springsecurity.security.browser.authentication.image.ImageCode;
+import cn.lovingliu.springsecurity.security.browser.authentication.image.SmsCode;
+import cn.lovingliu.springsecurity.security.browser.service.SmsCodeSenderService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.social.connect.web.HttpSessionSessionStrategy;
 import org.springframework.social.connect.web.SessionStrategy;
+import org.springframework.web.bind.ServletRequestBindingException;
+import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -24,13 +30,28 @@ import java.util.Random;
 @RestController
 @Slf4j
 public class ValidateCodeController {
-    private static final String SESSION_KEY = "IMAGE_CODE_KEY";
+    private static final String SESSION_IMAGE_CODE_KEY = "IMAGE_CODE_KEY";
+    private static final String SESSION_SMS_CODE_KEY = "SMS_CODE_KEY";
     private SessionStrategy sessionStrategy = new HttpSessionSessionStrategy();
 
+    @Autowired
+    private SmsCodeSenderService smsCodeSenderService;
+
+    @GetMapping("/code/sms")
+    public void createSmsCode(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletRequestBindingException {
+        // 1.生成短信验证码(长度为4)
+        SmsCode smsCode = createSmsCode();
+        // 2.保存到Session
+        sessionStrategy.setAttribute(new ServletWebRequest(request),SESSION_SMS_CODE_KEY,smsCode);
+        // 3.发送到用户手
+        String mobile = ServletRequestUtils.getRequiredStringParameter(request,"mobile");
+        smsCodeSenderService.send(mobile,smsCode.getCode());
+    }
+
     @GetMapping("/code/image")
-    public void createCode(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void createImageCode(HttpServletRequest request, HttpServletResponse response) throws IOException {
         ImageCode imageCode = createImageCode();
-        sessionStrategy.setAttribute(new ServletWebRequest(request),SESSION_KEY,imageCode);
+        sessionStrategy.setAttribute(new ServletWebRequest(request),SESSION_IMAGE_CODE_KEY,imageCode);
         ImageIO.write(imageCode.getImage(),"JPEG",response.getOutputStream());
     }
     private ImageCode createImageCode(){
@@ -78,5 +99,11 @@ public class ValidateCodeController {
         int g = fc + random.nextInt(bc - fc);
         int b = fc + random.nextInt(bc - fc);
         return new Color(r, g, b);
+    }
+
+    private SmsCode createSmsCode(){
+        String code = RandomStringUtils.randomNumeric(4);
+        SmsCode smsCode = new SmsCode(code,60);
+        return smsCode;
     }
 }
