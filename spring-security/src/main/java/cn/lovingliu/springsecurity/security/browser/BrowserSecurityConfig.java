@@ -1,6 +1,7 @@
 package cn.lovingliu.springsecurity.security.browser;
 
 import cn.lovingliu.springsecurity.security.browser.authentication.image.ImageValidateCodeFilter;
+import cn.lovingliu.springsecurity.security.browser.config.MyUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+
+import javax.sql.DataSource;
 
 /**
  * @Author：LovingLiu
@@ -28,6 +33,18 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
+    }
+
+    @Autowired
+    private MyUserDetailsService userDetailsService;
+    @Autowired
+    private DataSource dataSource;
+    @Bean
+    public PersistentTokenRepository persistentTokenRepository(){
+        JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
+        tokenRepository.setDataSource(dataSource);
+        tokenRepository.setCreateTableOnStartup(true); // 系统启动时自动创建表（仅仅限制第一次系统启动,启动一次之后注解掉）
+        return tokenRepository;
     }
 
     @Override
@@ -51,6 +68,11 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
                     // 自定义登录成功/失败处理
                     .successHandler(myAuthenticationSuccessHandler)
                     .failureHandler(myAuthenticationFailureHandler)
+                .and()
+                .rememberMe()
+                    .tokenRepository(persistentTokenRepository()) // token 存放的数据库配置
+                    .tokenValiditySeconds(3600) // token 有效时间
+                    .userDetailsService(userDetailsService) // 用户详情
             .and()
                 .csrf().disable();// 关闭跨站请求保护
 
