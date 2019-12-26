@@ -1,4 +1,4 @@
-package cn.lovingliu.springsecurity.security.browser.authentication;
+package cn.lovingliu.springsecurity.security.browser.authentication.login;
 
 import cn.lovingliu.springsecurity.security.browser.constant.BrowserConstant;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,7 +30,7 @@ public class MyAuthenticationFailureHandler extends SimpleUrlAuthenticationFailu
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        log.info("【MyAuthenticationFailureHandler】=>【onAuthenticationFailure】=>【登录失败】");
+        log.info("【MyAuthenticationFailureHandler】=>【onAuthenticationFailure】=>【登录失败{}】",exception.getMessage());
         if(systemLoginType.equals(BrowserConstant.systemLoginType.MOBILE)){
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.setContentType("application/json;charset=UTF-8");

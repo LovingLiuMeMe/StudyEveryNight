@@ -2,4 +2,4 @@ server:
   port: 8081
 
 system:
-  login-type: mobile
+  login-type: pc

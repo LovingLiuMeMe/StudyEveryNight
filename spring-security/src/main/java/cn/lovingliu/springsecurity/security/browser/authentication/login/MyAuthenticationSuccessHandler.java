@@ -1,4 +1,4 @@
-package cn.lovingliu.springsecurity.security.browser.authentication;
+package cn.lovingliu.springsecurity.security.browser.authentication.login;
 
 import cn.lovingliu.springsecurity.security.browser.constant.BrowserConstant;
 import com.fasterxml.jackson.databind.ObjectMapper;
