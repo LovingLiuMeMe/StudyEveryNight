@@ -1,4 +1,4 @@
-package cn.lovingliu.springsecurity.security.browser.authentication.image;
+package cn.lovingliu.springsecurity.security.browser.common;
 
 import org.springframework.security.core.AuthenticationException;
 

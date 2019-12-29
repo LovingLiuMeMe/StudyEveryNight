@@ -1,11 +1,13 @@
 package cn.lovingliu.springsecurity.security.browser;
 
 import cn.lovingliu.springsecurity.security.browser.authentication.image.ImageValidateCodeFilter;
+import cn.lovingliu.springsecurity.security.browser.authentication.sms.SmsCodeAuthenticationConfig;
 import cn.lovingliu.springsecurity.security.browser.config.MyUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,13 +25,20 @@ import javax.sql.DataSource;
  * @Date：Created in 2019-12-25
  */
 @Configuration
+@EnableWebSecurity
 public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
-
+    /**
+     * 自定义登录 成功/失败 处理
+     */
     @Autowired
     private AuthenticationSuccessHandler myAuthenticationSuccessHandler;
     @Autowired
     private AuthenticationFailureHandler myAuthenticationFailureHandler;
 
+    /**
+     * 密码的加解密
+     * @return
+     */
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
@@ -37,8 +46,22 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private MyUserDetailsService userDetailsService;
+    /**
+     * 记住我功能: 获取数据源 存入数据库
+     */
     @Autowired
     private DataSource dataSource;
+
+    /**
+     * 自定义登录方式:短信登录 配置
+     */
+    @Autowired
+    private SmsCodeAuthenticationConfig smsCodeAuthenticationConfig;
+
+    /**
+     * 表单登录,记住我功能
+     * @return
+     */
     @Bean
     public PersistentTokenRepository persistentTokenRepository(){
         JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
@@ -74,7 +97,8 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
                     .tokenValiditySeconds(3600) // token 有效时间
                     .userDetailsService(userDetailsService) // 用户详情
             .and()
-                .csrf().disable();// 关闭跨站请求保护
+                .csrf().disable()// 关闭跨站请求保护
+                .apply(smsCodeAuthenticationConfig);
 
 
     }

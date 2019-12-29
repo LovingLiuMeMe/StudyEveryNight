@@ -1,6 +1,7 @@
 package cn.lovingliu.springsecurity.security.browser.authentication.image;
 
 
+import cn.lovingliu.springsecurity.security.browser.common.ValidateCodeException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -19,7 +20,7 @@ import java.io.IOException;
 
 /**
  * @Author：LovingLiu
- * @Description:
+ * @Description: 仅仅对表单登录中的图片验证码进行校
  * @Date：Created in 2019-12-26
  */
 @Slf4j
@@ -51,8 +52,7 @@ public class ImageValidateCodeFilter extends OncePerRequestFilter {
         try {
             codeInRequest = ServletRequestUtils.getStringParameter(request.getRequest(), "imageCode");
         } catch (ServletRequestBindingException e) {
-            log.error("【ImageValidateCodeFilter】=> 【doFilterInternal】=> 【imageCode参数缺失】");
-            e.printStackTrace();
+            throw new ValidateCodeException("imageCode参数缺失");
         }
 
         if(StringUtils.isBlank(codeInRequest)){

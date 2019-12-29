@@ -1,4 +1,4 @@
-package cn.lovingliu.springsecurity.security.browser.authentication.image;
+package cn.lovingliu.springsecurity.security.browser.authentication.sms;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class SmsCode {
     private String code;
+    private String telephone;
     private LocalDateTime expireTime;
 
     public SmsCode(String code, Integer expireIn){

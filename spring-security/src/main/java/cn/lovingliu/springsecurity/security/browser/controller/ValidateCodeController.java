@@ -1,7 +1,7 @@
 package cn.lovingliu.springsecurity.security.browser.controller;
 
 import cn.lovingliu.springsecurity.security.browser.authentication.image.ImageCode;
-import cn.lovingliu.springsecurity.security.browser.authentication.image.SmsCode;
+import cn.lovingliu.springsecurity.security.browser.authentication.sms.SmsCode;
 import cn.lovingliu.springsecurity.security.browser.service.SmsCodeSenderService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -39,12 +39,13 @@ public class ValidateCodeController {
 
     @GetMapping("/code/sms")
     public void createSmsCode(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletRequestBindingException {
+        String mobile = ServletRequestUtils.getRequiredStringParameter(request,"mobile");
         // 1.生成短信验证码(长度为4)
         SmsCode smsCode = createSmsCode();
+        smsCode.setTelephone(mobile);
         // 2.保存到Session
         sessionStrategy.setAttribute(new ServletWebRequest(request),SESSION_SMS_CODE_KEY,smsCode);
         // 3.发送到用户手
-        String mobile = ServletRequestUtils.getRequiredStringParameter(request,"mobile");
         smsCodeSenderService.send(mobile,smsCode.getCode());
     }
 
