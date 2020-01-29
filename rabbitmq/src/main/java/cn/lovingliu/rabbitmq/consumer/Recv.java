@@ -18,7 +18,6 @@ public class Recv{
         /** 2.获取通道 */
         Channel channel = newConnection.createChannel();
         channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-
         /** 3.监听队列 */
         channel.basicConsume(QUEUE_NAME, true, new MyConsumer(channel));
     }
